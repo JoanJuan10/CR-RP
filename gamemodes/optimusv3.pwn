@@ -59401,7 +59401,7 @@ stock GetDateStr()
 new
 	PapaSpell;
 
-	CMD:papaspell(playerid, params[])
+	CMD:papajoan(playerid, params[])
 	{
 	    if (PapaSpell)
 	        PapaSpell = 0;
@@ -59422,11 +59422,11 @@ new
 				A_Format (str, "Regalos/%s.nvd", pName(playerid));
 
 				if (fexist (str))
-					return MensajeF (playerid, -1, "Ya recibiste tu regalo de navidad, ahora esperemos juntos al "#CINFO"25/12/2014.");
+					return MensajeF (playerid, -1, "Ya recibiste tu regalo de navidad, ahora esperemos juntos al "#CINFO"25/12/2020.");
 
 				if (!random(4) && !PapaSpell)
 				{
-					Error (playerid, "~b~~h~~h~¡Papa Spell ~w~te desea felices fiestas y prospero año nuevo!");
+					Error (playerid, "~b~~h~~h~¡Papa Joan ~w~te desea felices fiestas y prospero año nuevo!");
 				}
 				DarRegalo (playerid, InfoJugador[playerid][jNivel]);
 				new
@@ -61607,7 +61607,7 @@ stock stralm (dest[], const string[], size_string = sizeof (string), size_dest =
 	CMD:advertir(playerid, params[])
 	{
 		if(Staff(playerid,Mod.Superior)) return 1;
-		if(sscanf(params, "us[120]", params[0], params[1])) return ParamsINC(playerid, "/daradvertencia [ID/Nombre] [Razón Advertencia]");
+		if(sscanf(params, "us[120]", params[0], params[1])) return ParamsINC(playerid, "/advertir [ID/Nombre] [Razón Advertencia]");
 		if(params[0] == INVALID_PLAYER_ID) return Error(playerid, "Jugador desconectado.");
 		InfoJugador[params[0]][jAdv] ++;
 		if(InfoJugador[params[0]][jAdv] >= 3)
@@ -61848,7 +61848,7 @@ stock MostrarLogs (playerid, querystr[])
 		    strcat (ticket_string, "\n	1.1: Preguntas del servidor, trabajos, etcétera.");
 		    strcat (ticket_string, "\n	1.2: Ver lista de comandos, trabajos, etcétera.");
 		    strcat (ticket_string, "\n	1.3: ¿Cuál es la IP de este servidor?");
-		    strcat (ticket_string, "\n	1.4: ¿Cuál es la IP del TeamSpeak3?");
+		    strcat (ticket_string, "\n	1.4: ¿Cuál es el link de Discord?");
 		    strcat (ticket_string, "\n	1.5: ¿Cuál es el foro?");
 		    strcat (ticket_string, "\n2.0: {FF0000}Problemas");
 		    strcat (ticket_string, "\n	2.1: Problemas con mi personaje");
