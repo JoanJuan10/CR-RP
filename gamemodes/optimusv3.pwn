@@ -2706,7 +2706,7 @@ new AyudaDueno[] =
 /vcrear /vborrar /vcrearventa /vborrarventa /vprecio /crearportonfam /crearportoncasa /editarporton /staff\n\
 /actualizararchivos /staffcuenta /rbots /recargarminrales /adminwarn /adminwarncuenta /limpiaradmwarn \n\
 /veradmwarns /dobleexp /crearestacion /borrarestacion /editarestacion /llenargasolinera /darobj /verobj\n\
-/llenarinv /clearoph /speclist /dararma /forzarimportaciones";
+/llenarinv /clearoph /speclist /dararma /forzarimportaciones /editarcuenta";
 
 new VehicleColoursTableRGBA[256] =
 {
@@ -7201,7 +7201,7 @@ new
 	restriccion8,
 	restriccion9;
 
-// ---====[ Enums ]====---- //
+// ---====[ Enums ]====---- //   VARIABLES JUGADOR
 
 enum InfoJ
 {
@@ -22137,6 +22137,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						Mensaje(playerid,1,"================================================================");
 						Mensaje(playerid,-1,"• "#CAZULRARO"¡Comienza a rolear! "#CBLANCO"Puedes rentar un "CINFO"vehículo "#CBLANCO"en frente.");
 						Mensaje(playerid,-1,"• Ademas, hay un mapa que te será de mucha utilidad para saber donde ir.");
+						Mensaje(playerid,-1,"• Puedes usar /recibirstats para recibir tus stats correspondientes.");
 						Mensaje(playerid,-1,"• Para entrar o salir de los lugares, dirigete a la puerta del mismo y presiona la letra "#CINFO"[Y]");
 						Mensaje(playerid,1,"================================================================");
 						Mensaje(playerid,-1,"• El comando "#CINFO"/informacion "#CBLANCO"te mostrará todo lo que es el servidor: Sistemas, Necesidades, y mucho más. ¡Utilizalo ahora mismo!");
@@ -59114,7 +59115,7 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 		return 1;
 	}
 
-	CMD:gotocar(playerid,params[])
+	CMD:irveh(playerid,params[])
 	{
 		if(Staff(playerid,Administrador)) return 1;
 		Para_Admin_Servicio
@@ -59133,7 +59134,7 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 	CMD:check(playerid,params[])
 	{
 	    if(Staff(playerid,Moderador)) return 1;
-	    if(sscanf(params,"u",params[0])) return ParamsINC(playerid,"/chequear [ID/NOMBRE]");
+	    if(sscanf(params,"u",params[0])) return ParamsINC(playerid,"/check [ID/NOMBRE]");
 	    if(!IsPlayerConnected(params[0])) return Error(playerid,"¡Jugador desconectado!");
 		if(!GetPVarInt(playerid,"ViendoCuenta"))
 		{
@@ -59401,7 +59402,7 @@ stock GetDateStr()
 new
 	PapaSpell;
 
-	CMD:papaspell(playerid, params[])
+	CMD:papajoan(playerid, params[])
 	{
 	    if (PapaSpell)
 	        PapaSpell = 0;
@@ -59422,11 +59423,11 @@ new
 				A_Format (str, "Regalos/%s.nvd", pName(playerid));
 
 				if (fexist (str))
-					return MensajeF (playerid, -1, "Ya recibiste tu regalo de navidad, ahora esperemos juntos al "#CINFO"25/12/2014.");
+					return MensajeF (playerid, -1, "Ya recibiste tu regalo de navidad, ahora esperemos juntos al "#CINFO"25/12/2020.");
 
 				if (!random(4) && !PapaSpell)
 				{
-					Error (playerid, "~b~~h~~h~¡Papa Spell ~w~te desea felices fiestas y prospero año nuevo!");
+					Error (playerid, "~b~~h~~h~¡Papa Joan ~w~te desea felices fiestas y prospero año nuevo!");
 				}
 				DarRegalo (playerid, InfoJugador[playerid][jNivel]);
 				new
@@ -61607,7 +61608,7 @@ stock stralm (dest[], const string[], size_string = sizeof (string), size_dest =
 	CMD:advertir(playerid, params[])
 	{
 		if(Staff(playerid,Mod.Superior)) return 1;
-		if(sscanf(params, "us[120]", params[0], params[1])) return ParamsINC(playerid, "/daradvertencia [ID/Nombre] [Razón Advertencia]");
+		if(sscanf(params, "us[120]", params[0], params[1])) return ParamsINC(playerid, "/advertir [ID/Nombre] [Razón Advertencia]");
 		if(params[0] == INVALID_PLAYER_ID) return Error(playerid, "Jugador desconectado.");
 		InfoJugador[params[0]][jAdv] ++;
 		if(InfoJugador[params[0]][jAdv] >= 3)
@@ -61848,7 +61849,7 @@ stock MostrarLogs (playerid, querystr[])
 		    strcat (ticket_string, "\n	1.1: Preguntas del servidor, trabajos, etcétera.");
 		    strcat (ticket_string, "\n	1.2: Ver lista de comandos, trabajos, etcétera.");
 		    strcat (ticket_string, "\n	1.3: ¿Cuál es la IP de este servidor?");
-		    strcat (ticket_string, "\n	1.4: ¿Cuál es la IP del TeamSpeak3?");
+		    strcat (ticket_string, "\n	1.4: ¿Cuál es el link de Discord?");
 		    strcat (ticket_string, "\n	1.5: ¿Cuál es el foro?");
 		    strcat (ticket_string, "\n2.0: {FF0000}Problemas");
 		    strcat (ticket_string, "\n	2.1: Problemas con mi personaje");
@@ -62765,6 +62766,18 @@ CALLBACK: GetPlayerAdminLevelOP(playerid)
 		}
 		return 1;
 	}
+	CMD:recibirstats(playerid, params[]){
+		if(InfoJugador[playerid][jNivel] >= 5) return Mensaje(playerid, -1, "¡Ya usaste este comando, no seas avaricioso!"); //Aparece esto cuando uses el comando por 2da vez
+		InfoJugador[playerid][jNivel] = 5; //El nivel que te dará cuando hayas puesto el comando
+		GivePlayerMoney(playerid, 80000);//El dinero que te dará cuando hayas puesto el comando
+		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 80.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
+		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel cinco.");
+		Mensaje(playerid, 0x00FF00FF, "Nota: Si haces multicuenta serás baneado automáticamente, nuestro sistema lo detectará.");
+
+		Mensaje(playerid, -1, "¡Felicidades, has recibido tus stats, disfrútalos!");
+		return 1;
+	}
+
 
 	AbreviarCMD(celular,cel);
 	AbreviarCMD(acciones,animaciones);
