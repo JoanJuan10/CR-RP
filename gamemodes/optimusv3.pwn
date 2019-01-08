@@ -2706,7 +2706,7 @@ new AyudaDueno[] =
 /vcrear /vborrar /vcrearventa /vborrarventa /vprecio /crearportonfam /crearportoncasa /editarporton /staff\n\
 /actualizararchivos /staffcuenta /rbots /recargarminrales /adminwarn /adminwarncuenta /limpiaradmwarn \n\
 /veradmwarns /dobleexp /crearestacion /borrarestacion /editarestacion /llenargasolinera /darobj /verobj\n\
-/llenarinv /clearoph /speclist /dararma /forzarimportaciones";
+/llenarinv /clearoph /speclist /dararma /forzarimportaciones /editarcuenta";
 
 new VehicleColoursTableRGBA[256] =
 {
@@ -59114,7 +59114,7 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 		return 1;
 	}
 
-	CMD:gotocar(playerid,params[])
+	CMD:irveh(playerid,params[])
 	{
 		if(Staff(playerid,Administrador)) return 1;
 		Para_Admin_Servicio
@@ -59133,7 +59133,7 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 	CMD:check(playerid,params[])
 	{
 	    if(Staff(playerid,Moderador)) return 1;
-	    if(sscanf(params,"u",params[0])) return ParamsINC(playerid,"/chequear [ID/NOMBRE]");
+	    if(sscanf(params,"u",params[0])) return ParamsINC(playerid,"/check [ID/NOMBRE]");
 	    if(!IsPlayerConnected(params[0])) return Error(playerid,"¡Jugador desconectado!");
 		if(!GetPVarInt(playerid,"ViendoCuenta"))
 		{
