@@ -7201,7 +7201,7 @@ new
 	restriccion8,
 	restriccion9;
 
-// ---====[ Enums ]====---- //
+// ---====[ Enums ]====---- //   VARIABLES JUGADOR
 
 enum InfoJ
 {
@@ -22137,6 +22137,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						Mensaje(playerid,1,"================================================================");
 						Mensaje(playerid,-1,"• "#CAZULRARO"¡Comienza a rolear! "#CBLANCO"Puedes rentar un "CINFO"vehículo "#CBLANCO"en frente.");
 						Mensaje(playerid,-1,"• Ademas, hay un mapa que te será de mucha utilidad para saber donde ir.");
+						Mensaje(playerid,-1,"• Puedes usar /recibirstats para recibir tus stats correspondientes.");
 						Mensaje(playerid,-1,"• Para entrar o salir de los lugares, dirigete a la puerta del mismo y presiona la letra "#CINFO"[Y]");
 						Mensaje(playerid,1,"================================================================");
 						Mensaje(playerid,-1,"• El comando "#CINFO"/informacion "#CBLANCO"te mostrará todo lo que es el servidor: Sistemas, Necesidades, y mucho más. ¡Utilizalo ahora mismo!");
@@ -62765,6 +62766,18 @@ CALLBACK: GetPlayerAdminLevelOP(playerid)
 		}
 		return 1;
 	}
+	CMD:recibirstats(playerid, params[]){
+		if(InfoJugador[playerid][jNivel] >= 5) return Mensaje(playerid, -1, "¡Ya usaste este comando, no seas avaricioso!"); //Aparece esto cuando uses el comando por 2da vez
+		InfoJugador[playerid][jNivel] = 5; //El nivel que te dará cuando hayas puesto el comando
+		GivePlayerMoney(playerid, 80000);//El dinero que te dará cuando hayas puesto el comando
+		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 80.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
+		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel cinco.");
+		Mensaje(playerid, 0x00FF00FF, "Nota: Si haces multicuenta serás baneado automáticamente, nuestro sistema lo detectará.");
+
+		Mensaje(playerid, -1, "¡Felicidades, has recibido tus stats, disfrútalos!");
+		return 1;
+	}
+
 
 	AbreviarCMD(celular,cel);
 	AbreviarCMD(acciones,animaciones);
