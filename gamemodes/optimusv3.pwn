@@ -57561,7 +57561,7 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 		}
 		if(InfoJugador[playerid][jLider] == IDGOBIERNO)
 		{
-			if(!IsPlayerInRangeOfPoint(playerid,2,358.7458,203.6272,1008.382)) return Error(playerid,"¡Aquí no puedes utilizar este comando!");
+			if(!IsPlayerInRangeOfPoint(playerid,3,1559.9559,-1481.5164,1370.3561)) return Error(playerid,"¡Aquí no puedes utilizar este comando!");
 			MensajeTodosF(C_GOBIERNO,"[Gobierno] %s", params);
 			return 1;
 		}
