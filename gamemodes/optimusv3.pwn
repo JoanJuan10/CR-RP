@@ -371,8 +371,8 @@ new Iterator:Planta<MAX_PLANTAS>;
 
 // ----=====] ID's vehiculos [=====---- //
 
-#define MIN_VEH_RENTA  		0
-#define MAX_VEH_RENTA   	24
+#define MIN_VEH_RENTA       82
+#define MAX_VEH_RENTA       105
 #define MIN_VEH_LSPD     	(MAX_VEH_RENTA+1)
 #define MAX_VEH_LSPD    	45
 #define MIN_VEH_LSEM    	(MAX_VEH_LSPD+1)
@@ -2072,7 +2072,8 @@ static const Float: CajaFuertePos [][] =
 	{2037.504882, 2855.557373, 1104.749389, 0.000000, 0.000000, -90.699989, 2036.4973,2855.5530,1104.749},    // Medicos
 	{1263.587280, -1178.007080, 1565.992065, 0.000000, 0.000000, 90.100051, 1264.3535,-1177.9749,1565.9921},  // LSTV
 	{1653.740234, -2167.733154, 13.836874, 0.000000, 0.000000, -90.399963, 1652.9738,-2167.7727,13.6369},     // Mecanicos
-	{99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0}, 												  // Gobierno
+	{1553.7915,-1484.0624,1370.3561, 0.000000, 0.000000, 273.9543, 99.0, 99.0, 99.0}, 						  // Gobierno
+	// 1553.7915,-1484.0624,1370.3561,273.9543,0,0,0,0,0,0
 	{205.733306, -1497.676269, 1011.766967, 0.000000, 0.000000, 90.099945, 206.5012,-1497.6931,1011.7670},    // Hitman
 	{2546.225585, -1393.109619, 1061.127929, 0.000000, 0.000000, 0.000000, 2546.2864,-1393.9667,1061.1575}    // Camioneros
 };
@@ -21433,8 +21434,9 @@ stock TieneLlaveVeh(playerid,vehid)
 {
 	if(veh_getType(vehid) == VEH_TYPE_OWNVEH)
 	{
-		if (veh_getOwnerCode(vehid) == InfoJugador[playerid][jNameCode])
+		if (veh_getOwnerCode(vehid) == InfoJugador[playerid][jNameCode]) {
 			return 2;
+		}
 
 		if (veh_getFamily(vehid) && veh_getFamily(vehid) == ID_Familia(playerid)) {
 			return 1;
@@ -33795,9 +33797,9 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	    {
 	    	if(VehRentado[VehID] == 0)
 	    	{
-				if(InfoJugador[playerid][jHoras] < 4)
+				if(InfoJugador[playerid][jHoras] > 30)
 				{
-					Mensaje (playerid, -1, "Para poder rentar un vehículo, deberás tener "#CAMARILLO"más de 4 horas "#CBLANCO"jugadas en el servidor.");
+					Mensaje (playerid, -1, "Para poder rentar un vehículo, deberás tener "#CAMARILLO"menos de 30 horas "#CBLANCO"jugadas en el servidor.");
 					return 1;
 				}
 
@@ -46826,7 +46828,7 @@ CALLBACK: empezarPicar (i)
 					else
 					{
 						NPCTalk(NPC_TRUTH, "Ahora estoy ocupado, hermano. ¡Vuelve luego!");
-						Error(playerid, "~b~Truth ~w~está ocupado, todabía no puede hablar contigo. Vuelve en 5 minutos");
+						Error(playerid, "~b~Truth ~w~está ocupado, todavia no puede hablar contigo. Vuelve en 5 minutos");
 						return 1;
 					}
 				}
@@ -47573,11 +47575,13 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 
 		if (isnull (strb))
 		{
-			strcat (strb, "\n"#CAMARILLO"11/10/1014 "#CROJO"[V3 FINAL]:"#CBLANCO"\n\n");
-			strcat (strb, "\t+ Arreglados todos los problemas de vehículos.\n");
-			strcat (strb, "\t+ Cuando un vehículo es destruido, tardará 50 minutos en aparecer.\n");
-			strcat (strb, "\t+ En los choques, los conductores perderán salud.\n");
-			strcat (strb, "\t+ Arregladas tarjetas de crédito y subsidios.\n");
+			strcat (strb, "\n"#CAMARILLO"13/01/2019 "#CROJO"[V3.2]:"#CBLANCO"\n\n");
+			strcat (strb, "\t+ Se ha cambiado la posicion de la caja fuerte del gobierno.\n");
+			strcat (strb, "\t+ Se han reparado los vehiculos de renta.\n");
+			strcat (strb, "\t+ Ya se puede usar el /veh para las familias.\n");
+			strcat (strb, "\t+ Bajado el nivel que otorga el /recibirstats (5 -> 2)\n");
+			strcat (strb, "\t+ Bajado subido el dinero que da el /recibirstats (80k -> 100k)\n");
+			strcat (strb, "\t+ Ahora puedes enviar una duda cada 60 segundos en lugar de 10 segundos\n");
 			strcat (strb, "\n\nInformación detallada en "#CAMARILLO"ciudadrealrp.x10.bz");
 		}
 
@@ -47609,9 +47613,9 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 
 		if(InfoJugador[playerid][jTiempoDudas] && InfoJugador[playerid][jAdmin] < Ayudante)
 		{
-		    if(InfoJugador[playerid][jTiempoDudas] <= 10)
+		    if(InfoJugador[playerid][jTiempoDudas] <= 60)
 		    {
-				MensajeF(playerid, -1, "Puedes enviar una duda cada "#CROJO"10"#CBLANCO" segundos. Faltan: "#CVERDE"%d"#CBLANCO" segundos.", InfoJugador[playerid][jTiempoDudas]);
+				MensajeF(playerid, -1, "Puedes enviar una duda cada "#CROJO"60"#CBLANCO" segundos. Faltan: "#CVERDE"%d"#CBLANCO" segundos.", InfoJugador[playerid][jTiempoDudas]);
 			}
 		    else
 		    {
@@ -51458,7 +51462,7 @@ stock PlayerRequestTaxi(playerid)
  	CMD:info2(playerid,params[])
 	{
 	    if(Staff(playerid,Ayudante)) return 1;
-	    MensajeTodos(-1,"- ¡Conectate a nuestro servidor de Discord! "#CVERDE"https://discord.gg/9WJsYS");
+	    MensajeTodos(-1,"- ¡Conectate a nuestro servidor de Discord! "#CVERDE"https://discord.gg/Zqw7NfU");
 		MensajeAdminF(C_ROJO,"[ADMINISTRACIÓN] > "#CBLANCO"%s usó el comando /info2",Destacado, NombreJugador_(playerid));
 	    return 1;
 	}
@@ -54475,7 +54479,6 @@ Float: Resto(num1, num2)
 			VehID = GetPlayerVehicleID(playerid);
 
 		if (!veh_isOwnVeh(VehID)) return Error(playerid,"Este comando se utiliza solo con vehículos propios.");
-		if (EsDuenoVeh(playerid, VehID) != 2) return Error(playerid,"Debe ser el propietario del vehiculo.");
 		if (!strcmp(params[0],"a familia",true))
 		{
 			new
@@ -57561,7 +57564,7 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 		}
 		if(InfoJugador[playerid][jLider] == IDGOBIERNO)
 		{
-			if(!IsPlayerInRangeOfPoint(playerid,2,358.7458,203.6272,1008.382)) return Error(playerid,"¡Aquí no puedes utilizar este comando!");
+			if(!IsPlayerInRangeOfPoint(playerid,3,1559.9559,-1481.5164,1370.3561)) return Error(playerid,"¡Aquí no puedes utilizar este comando!");
 			MensajeTodosF(C_GOBIERNO,"[Gobierno] %s", params);
 			return 1;
 		}
@@ -62767,11 +62770,11 @@ CALLBACK: GetPlayerAdminLevelOP(playerid)
 		return 1;
 	}
 	CMD:recibirstats(playerid, params[]){
-		if(InfoJugador[playerid][jNivel] >= 5) return Mensaje(playerid, -1, "¡Ya usaste este comando, no seas avaricioso!"); //Aparece esto cuando uses el comando por 2da vez
-		InfoJugador[playerid][jNivel] = 5; //El nivel que te dará cuando hayas puesto el comando
-		GivePlayerMoney(playerid, 80000);//El dinero que te dará cuando hayas puesto el comando
-		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 80.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
-		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel cinco.");
+		if(InfoJugador[playerid][jNivel] >= 2) return Mensaje(playerid, -1, "¡Ya usaste este comando, no seas avaricioso!"); //Aparece esto cuando uses el comando por 2da vez
+		InfoJugador[playerid][jNivel] = 2; //El nivel que te dará cuando hayas puesto el comando
+		GivePlayerMoney(playerid, 100000);//El dinero que te dará cuando hayas puesto el comando
+		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 100.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
+		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel dos.");
 		Mensaje(playerid, 0x00FF00FF, "Nota: Si haces multicuenta serás baneado automáticamente, nuestro sistema lo detectará.");
 
 		Mensaje(playerid, -1, "¡Felicidades, has recibido tus stats, disfrútalos!");
