@@ -371,8 +371,8 @@ new Iterator:Planta<MAX_PLANTAS>;
 
 // ----=====] ID's vehiculos [=====---- //
 
-#define MIN_VEH_RENTA  		0
-#define MAX_VEH_RENTA   	24
+#define MIN_VEH_RENTA       82
+#define MAX_VEH_RENTA       105
 #define MIN_VEH_LSPD     	(MAX_VEH_RENTA+1)
 #define MAX_VEH_LSPD    	45
 #define MIN_VEH_LSEM    	(MAX_VEH_LSPD+1)
@@ -33797,9 +33797,9 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	    {
 	    	if(VehRentado[VehID] == 0)
 	    	{
-				if(InfoJugador[playerid][jHoras] > 10)
+				if(InfoJugador[playerid][jHoras] > 30)
 				{
-					Mensaje (playerid, -1, "Para poder rentar un vehículo, deberás tener "#CAMARILLO"menos de 10 horas "#CBLANCO"jugadas en el servidor.");
+					Mensaje (playerid, -1, "Para poder rentar un vehículo, deberás tener "#CAMARILLO"menos de 30 horas "#CBLANCO"jugadas en el servidor.");
 					return 1;
 				}
 
