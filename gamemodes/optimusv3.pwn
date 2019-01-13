@@ -47575,11 +47575,13 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 
 		if (isnull (strb))
 		{
-			strcat (strb, "\n"#CAMARILLO"10/01/2019 "#CROJO"[V3 FINAL]:"#CBLANCO"\n\n");
-			strcat (strb, "\t+ Arreglados todos los problemas de vehículos.\n");
-			strcat (strb, "\t+ Cuando un vehículo es destruido, tardará 50 minutos en aparecer.\n");
-			strcat (strb, "\t+ En los choques, los conductores perderán salud.\n");
-			strcat (strb, "\t+ Arregladas tarjetas de crédito y subsidios.\n");
+			strcat (strb, "\n"#CAMARILLO"13/01/2019 "#CROJO"[V3.2]:"#CBLANCO"\n\n");
+			strcat (strb, "\t+ Se ha cambiado la posicion de la caja fuerte del gobierno.\n");
+			strcat (strb, "\t+ Se han reparado los vehiculos de renta.\n");
+			strcat (strb, "\t+ Ya se puede usar el /veh para las familias.\n");
+			strcat (strb, "\t+ Bajado el nivel que otorga el /recibirstats (5 -> 2)\n");
+			strcat (strb, "\t+ Bajado subido el dinero que da el /recibirstats (80k -> 100k)\n");
+			strcat (strb, "\t+ Ahora puedes enviar una duda cada 60 segundos en lugar de 10 segundos\n");
 			strcat (strb, "\n\nInformación detallada en "#CAMARILLO"ciudadrealrp.x10.bz");
 		}
 
@@ -62768,11 +62770,11 @@ CALLBACK: GetPlayerAdminLevelOP(playerid)
 		return 1;
 	}
 	CMD:recibirstats(playerid, params[]){
-		if(InfoJugador[playerid][jNivel] >= 5) return Mensaje(playerid, -1, "¡Ya usaste este comando, no seas avaricioso!"); //Aparece esto cuando uses el comando por 2da vez
-		InfoJugador[playerid][jNivel] = 5; //El nivel que te dará cuando hayas puesto el comando
-		GivePlayerMoney(playerid, 80000);//El dinero que te dará cuando hayas puesto el comando
-		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 80.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
-		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel cinco.");
+		if(InfoJugador[playerid][jNivel] >= 2) return Mensaje(playerid, -1, "¡Ya usaste este comando, no seas avaricioso!"); //Aparece esto cuando uses el comando por 2da vez
+		InfoJugador[playerid][jNivel] = 2; //El nivel que te dará cuando hayas puesto el comando
+		GivePlayerMoney(playerid, 100000);//El dinero que te dará cuando hayas puesto el comando
+		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 100.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
+		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel dos.");
 		Mensaje(playerid, 0x00FF00FF, "Nota: Si haces multicuenta serás baneado automáticamente, nuestro sistema lo detectará.");
 
 		Mensaje(playerid, -1, "¡Felicidades, has recibido tus stats, disfrútalos!");
