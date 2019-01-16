@@ -292,8 +292,8 @@ enum E_INV_DATA
 new Iterator:Planta<MAX_PLANTAS>;
 
 //GangZones
-#define MIN_ATACANTES_GZ     6
-#define TIEMPO_GUERRA_GZ     (60*3)
+#define MIN_ATACANTES_GZ     4
+#define TIEMPO_GUERRA_GZ     (60*4)
 
 //Size (Negocios y casas)
 
@@ -7091,11 +7091,11 @@ static const ColoresGZ[] =
  	0x00CF0081,// FAMILIA 1: GROVE (VERDE)
  	0xAF00AF81,// FAMILIA 2: BALLAS (MORADO)
  	0x0000FF81, // FAMILIA 3: SUREÑOS (AZUL)
-	0xC8C3C381, //NO SE
- 	0x00CF0081, //NO SE
- 	0xAF00AF81, //NO SE
-	0xC8C3C381, //NO SE
- 	0x00CF0081, //NO SE
+	0xFFFF0081, // LATIN KINGS
+ 	0x00CF0081, //GROVE STREET
+ 	0xAF00AF81, //BALLAS
+	0xC8C3C381, //Motociclistas
+ 	0xFF000081, //MURDOCK
  	0xAF00AF81 //NO SE
 };
 
@@ -16356,7 +16356,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			if(!InfoNegocio[NegID][nStock][0])
 			    return Error(playerid, "Éste negocio no tiene más trajes para vender");
 
-	    	if( !RopaPandilla(ID_Familia(playerid), modelid) ) return Error(playerid,"¡No podes usar esta ropa, porque no perteneces a su banda!");
+	    //	if( !RopaPandilla(ID_Familia(playerid), modelid) ) return Error(playerid,"¡No podes usar esta ropa, porque no perteneces a su banda!");
 
 			InfoNegocio[NegID][nDinero] += 400;
 			QuitarDinero(playerid,400);
@@ -47575,13 +47575,9 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 
 		if (isnull (strb))
 		{
-			strcat (strb, "\n"#CAMARILLO"13/01/2019 "#CROJO"[V3.2]:"#CBLANCO"\n\n");
-			strcat (strb, "\t+ Se ha cambiado la posicion de la caja fuerte del gobierno.\n");
-			strcat (strb, "\t+ Se han reparado los vehiculos de renta.\n");
-			strcat (strb, "\t+ Ya se puede usar el /veh para las familias.\n");
-			strcat (strb, "\t+ Bajado el nivel que otorga el /recibirstats (5 -> 2)\n");
-			strcat (strb, "\t+ Bajado subido el dinero que da el /recibirstats (80k -> 100k)\n");
-			strcat (strb, "\t+ Ahora puedes enviar una duda cada 60 segundos en lugar de 10 segundos\n");
+			strcat (strb, "\n"#CAMARILLO"13/01/2019 "#CROJO"[V3.3]:"#CBLANCO"\n\n");
+			strcat (strb, "\t+ Se ha reparado el /atar.\n");
+			strcat (strb, "\t+ Se han reparado las zonas de pandillas (colores).\n");
 			strcat (strb, "\n\nInformación detallada en "#CAMARILLO"ciudadrealrp.x10.bz");
 		}
 
@@ -48074,6 +48070,22 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 		AutoRol(playerid,Str);
 		return 1;
 	}
+	CMD:atar(playerid,params[])
+	{
+	    NeedObject(playerid)<INV_SOGA>;
+	    if(sscanf(params,"u",params[0])) return ParamsINC(playerid,"/atar [ID/NOMBRE]");
+		if(!IsPlayerConnected(params[0])) return Error(playerid,"¡Jugador desconectado!");
+		if(GetPVarInt(params[0],"ESTA_ATADO")) return Error(playerid,"Ya esta atado");
+		if(!ProxDetectorS(3,playerid,params[0])) return Error(playerid,"¡Estas muy lejos de ese jugador!");
+		GameTextForPlayer(params[0],"~n~~n~~n~~r~atado",25000,3);
+		SetPVarInt(params[0],"ESTA_ATADO",1);
+        CongelarEx(params[0]);
+		new Str[80];
+		A_Format(Str,"saca una cuerda y ata a %s",NombreJugador(params[0]));
+		AutoRol(playerid,Str);
+		Mensaje(playerid,-1,"para desatarle, usa "#CINFO"(/desatar)");
+		return 1;
+	}
 
 
 	CMD:desatar(playerid,params[])
@@ -48086,6 +48098,7 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 		DeletePVar(params[0],"ESTA_ATADO");
 		GameTextForPlayer(params[0],"~g~desatado",3000,3);
 		new Str[30];
+		Descongelar(params[0]);
 		A_Format(Str,"desata a %s",NombreJugador(params[0]));
 		AutoRol(playerid,Str);
 		return 1;
