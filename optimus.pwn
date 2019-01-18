@@ -39,10 +39,9 @@ AntiDeAMX()
    new a[][] = { "Unarmed (Fist)", "Brass K" };
    #pragma unused a
 }
-
 // Version 3 final
-#define V3
-
+#define V3.4
+	#pragma tabsize 0
 // -----====] General [====---- //
 
 //Debug de vehículos
@@ -55,7 +54,7 @@ AntiDeAMX()
 #define MAILER_MAX_MAIL_SIZE  	(1024)
 
 //Registro
-#define HEADER_REGISTRO         "{FFFFFF}Registrese en {92CFB4}Ciudad Real Roleplay (V3)"
+#define HEADER_REGISTRO         "{FFFFFF}Registrese en {92CFB4}Ciudad Real Roleplay (V3.4)"
 
 #define DIALOG_REGISTRO 		"\n\t\t\t{ffffff}________________________________\n\n\t\t\t¡BIENVENIDO A {92CFB4}Ciudad Real Roleplay{FFFFFF}!\n\t\t\t________________________________\n\n\n\n• Escriba una contraseña para registrar la cuenta {00C0FF}%s {FFFFFF}en el servidor.\n\n\n"
 #define DIALOG_REGISTRO2        "\n\n{FFFFFF}Ahora, escribe tu contraseña nuevamente para confirmar.\n\n\n"
@@ -66,7 +65,7 @@ AntiDeAMX()
 #define DIALOG_EMAIL3           "\n\n			{FFFFFF}El correo fue enviado a {92CFB4}%s{FFFFFF}.\n\n\n\n\n{FFFF00}¿Aún no recibió nada? {FFFFFF}\n\n	>> El correo puede tardar hasta un máximo de 5 minutos en llegar a su destinatario.\n\n	>> Revise en 'correo no deseado' (debajo de 'bandeja de entrada' en caso de usar outlook).\n	    Posiblemente sus filtros marcaron nuestro correo como SPAM.\n\n\n\nA continuación, escriba el código de activación recibido:"
 
 //Ingreso
-#define HEADER_INGRESO          "{FFFFFF}Identifiquese en {92CFB4}Ciudad Real Roleplay (V3)"
+#define HEADER_INGRESO          "{FFFFFF}Identifiquese en {92CFB4}Ciudad Real Roleplay (V3.4)"
 #define DIALOG_INGRESO          "\n\t\t\t\t{ffffff}________________________________\n\n\t\t\t\t¡BIENVENIDO A {92CFB4}Ciudad Real Roleplay{FFFFFF}!\n\t\t\t\t________________________________\n\n\n\nLa cuenta {00C0FF}%s {FFFFFF}está registrada en el servidor. Si es el propietario de esta cuenta, escriba\nsu contraseña para ingresar a jugar. De lo contrario, vuelva a entrar al juego usando otro nombre.\n\n\n\n"
 
 //Config
@@ -75,7 +74,7 @@ AntiDeAMX()
 //WEB/NOMBRE (CONFIGURACIÓN GENERAL)
 #define FORO_SERVER "ciudadrealrp.x10.bz"
 #define NOMBRE_SERVER "|| Ciudad Real - RP en Español | Pass: ciudadrealrp ||"
-#define MODE_SERVER "CR:RP V4 - RolePlay en español"
+#define MODE_SERVER "CR:RP V3.4 - RolePlay en español"
 #define RCON_SERVER ""
 
 //Anti bots
@@ -234,6 +233,9 @@ new Iterator:Estacion<MAX_ESTACIONES>;
 //Checkpoints
 #define CHECKPOINT_STREAM   5000.0
 
+//Dudas
+new Dudo[MAX_PLAYERS];
+new uDudar[MAX_PLAYERS];
 //Peajes
 
 //Cords
@@ -639,8 +641,9 @@ static
 #define TIMER_REPARTIRPIZZA 9
 #define TIMER_LLAMADA		10
 #define TIMER_HABLAR		11
+#define TIMER_DUDAR         12
 
-#define MAX_TIMERS			12
+#define MAX_TIMERS			13
 
 // ----====] INTERIORES [=====---- //
 
@@ -2025,43 +2028,6 @@ static const Acentos[][] =
 	{"Griego"},
 	{"Polaco"},
 	{"Británico"}
-};
-
-static const MalasPalabras[][] =
-{
-	{"puto"},
-	{"putos"},
-	{"unplayer"},
-	{"un player"},
-	{"pete"},
-	{"petes"},
-	{"la concha de tu madre"},
-	{"server de mierda"},
-	{"es una mierda"},
-	{"hijo de puta"},
-	{"hijos de puta"},
-	{"forro de mierda"},
-	{"chupapija"},
-	{"chupa pija"},
-	{"chupamela"},
-	{"chupapito"},
-	{"chupa pito"},
-	{"negro de mierda"},
-	{"server pija"},
-	{"chupame el pito"},
-	{"chupenme el pito"},
-	{"euliala"},
-	{"fenixzone"},
-	{"fenix zone"},
-	{"ciudadlibre"},
-	{"ciudad libre"},
-	{"lsrp"},
-	{"ls rp"},
-	{"ls-rp"},
-	{"ls:rp"},
-	{"zenoncity"},
-	{"zenon"},
-	{"zenon city"}
 };
 
 static const Float: CajaFuertePos [][] =
@@ -8499,6 +8465,12 @@ stock Float: GetPointZPos(const Float: fX, const Float: fY, &Float: fZ = 0.0) //
         return (fZ = ((afZ[0] >>> 16) * 0.01));
 }
 
+_TallerLSPD(playerid) {
+    if (IsPlayerInRangeOfPoint(playerid, 4.0, 1602.9409,-1611.0092,14.4231)) return 1;
+    else if (IsPlayerInRangeOfPoint(playerid, 4.0, 1593.8356,-1611.3290,14.4447)) return 1;
+    return 0;
+}
+
 stock MostrarNecesidadesEx(playerid)
 {
 	if(InfoJugador[playerid][jNecesidades] == 0)
@@ -9006,6 +8978,22 @@ CALLBACK: Float: GetWeaponPower (objectid)
  		extra_damage += 0.75;
 	}
 	return extra_damage;
+}
+
+CALLBACK: sDuda(playerid)
+{
+	uDudar[playerid] = 1;
+	if(Timer_Jugador[playerid][TIMER_DUDAR] == INVALID_TIMER_ID){
+		Timer_Jugador[playerid][TIMER_DUDAR] = SetTimerEx("nDuda",120000,0,"d",playerid);
+	}
+	return 1;
+}
+
+CALLBACK: nDuda(playerid)
+{
+	uDudar[playerid] = 0;
+	KillTimer2(playerid,TIMER_DUDAR);
+	return 1;
 }
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
@@ -10289,6 +10277,10 @@ _OnGameModeInit()
 	CreateDynamicPickup(ID_PICKUPINFO, 1, -1976.2792,609.8074,1055.5859); // comprar frecuencia
 	CreateDynamicPickup(ID_PICKUPINFO, 1, -39.6190,-1781.3674,743.9971); // recoger pala dejar
 	CreateDynamicPickup(ID_PICKUPCAJAFUERTE, 1, -851.2987,1624.7511,1004.7500); // Subsidio
+	CreateDynamicPickup(ID_PICKUPINFO,1,1602.9409,-1611.0092,14.4231,-1,-1,-1,80);//taller (LSPD)
+	CreateDynamicPickup(ID_PICKUPINFO,1,1593.8356,-1611.3290,14.4447,-1,-1,-1,80);//taller (LSPD)
+	CreateDynamic3DTextLabel("Área de Reparaciones\nAquí podrás reparar tu unidad\n\n"#CINFO"(/repararlspd)",C_BLANCO,1602.9409,-1611.0092,14.4231,10);
+	CreateDynamic3DTextLabel("Área de Reparaciones\nAquí podrás reparar tu unidad\n\n"#CINFO"(/repararlspd)",C_BLANCO,1593.8356,-1611.3290,14.4447,10);
 
 	//  Ascensor Hitman
 	CreateDynamicPickup(ID_PICKUPINT, 1, 350.2999878,178.0000000,1014.2000122);
@@ -21540,8 +21532,8 @@ stock ID_Faccion(playerid)
 
 stock EsDueno(playerid)
 {
-	return(!strcmp(NombreJugador(playerid),"Ryan Spell",		false)
-		|| !strcmp(NombreJugador(playerid),"Miky Boyx",		 	false)
+	return (!strcmp(NombreJugador(playerid),"_____ ______ ________ _________",		false)
+		|| !strcmp(NombreJugador(playerid),"_____ ______ ______ ______",		 	false)
 		|| InfoJugador[playerid][jAdmin] == Dueno);
 }
 
@@ -23313,7 +23305,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			 	return 1;
 			}
 		    new
-				ID = GetPVarInt(playerid,"ClickedID"),Info[40],InfoEx[70],sucess = 1,
+				ID = GetPVarInt(playerid,"ClickedID"),Infoxo[40],InfoEx[70],sucess = 1,
 				ADM_HEAD[MAX_PLAYER_NAME+30];
 
 			A_Format(ADM_HEAD, ""#CBLANCO"ADMINISTRACIÓN >> "#CHAMBRE"%s", pName(ID));
@@ -23323,19 +23315,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 			    	if(strval(inputtext) < 0 || strval(inputtext) > 300) return Dialog(playerid,dAdmClick,DIALOG_STYLE_INPUT,ADM_HEAD,""#CBLANCO"Introduce un número: ( = o > 0 & < 300 )","Aceptar","Cancelar");
 					SetPlayerSkin(ID,strval(inputtext));
-	   				Info = "cambio el skin de";
+	   				Infoxo = "cambio el skin de";
 					sucess++;
 				}
 				case ADM_EligeInt:
 			    {
 					SetPlayerInterior(ID,strval(inputtext));
-	  				Info = "le cambio el interior a";
+	  				Infoxo = "le cambio el interior a";
 					sucess++;
 				}
 				case ADM_EligeVW:
 			    {
 					SetPlayerVirtualWorld(ID,strval(inputtext));
-	  				Info = "le cambio el virtual world a";
+	  				Infoxo = "le cambio el virtual world a";
 					sucess++;
 				}
 				case ADM_Vida:
@@ -23345,12 +23337,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						case 0:
 						{
 						    SetPlayerHealth(ID,100);
-						    Info = "curo a";
+						    Infoxo = "curo a";
 						}
 						case 1:
 						{
 							SetPlayerHealth(ID,0);
-							Info = "asesino a";
+							Infoxo = "asesino a";
 						}
 					}
 				}
@@ -23380,7 +23372,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					Mensaje(ID, 1,   "=========================================================================");
 					MensajeF(ID, -1, "- Fuiste encarcelado por %s "#CROJO"(%.0f:%.0f horas - Razón: %s)",NombreJugador(playerid), Horas, Minutos, inputtext);
 					Mensaje(ID, 1,   "=========================================================================");
-					Info = "Encarcelo a";
+					Infoxo = "Encarcelo a";
 					format(InfoEx,sizeof(InfoEx),"(%02.0f:%02.0f HS - %s)",Horas, Minutos, inputtext);
 					SetPlayerVarString (ID, "AdminJail", pName (playerid));
 					alm(InfoJugador[ID][jAdminJail], pName(playerid) );
@@ -23429,7 +23421,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						    if(!InfoJugador[ID][jMiembroFam] && !InfoJugador[ID][jLiderFam])
 						        return Error(playerid, "Ese jugador no tiene familia.");
 
-						    Info = "expulso de su familia a";
+						    Infoxo = "expulso de su familia a";
 
 						    if(!strcmp(InfoFamilia[ID_Familia(ID)][fLider], pName(ID) ))
 						    {
@@ -23470,7 +23462,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case ADM_FamRango:
 				{
     				InfoJugador[ID][jRangoFam] = strval(inputtext);
-    				Info = "le modifico el rango a";
+    				Infoxo = "le modifico el rango a";
 					format(InfoEx,sizeof(InfoEx),"(Rango %d)",strval(inputtext));
 					sucess++;
 				}
@@ -23478,7 +23470,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(ID_Faccion(ID)) return Error(playerid, "No está permitido tener Familia y Facción.");
 				    new Fam = listitem+1;
-				    Info = "le dio miembro de familia a";
+				    Infoxo = "le dio miembro de familia a";
 				    InfoJugador[ID][jMiembroFam] = Fam;
 				    InfoJugador[ID][jLiderFam] = 0;
 					format(InfoEx,sizeof(InfoEx),"(Familia %s)",InfoFamilia[Fam][fNombre]);
@@ -23488,7 +23480,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(ID_Faccion(ID)) return Error(playerid, "No está permitido tener Familia y Facción.");
 				    new Fam = listitem+1;
-				    Info = "le dio lider de familia a";
+				    Infoxo = "le dio lider de familia a";
 				    InfoJugador[ID][jMiembroFam] = 0;
 				    InfoJugador[ID][jLiderFam] = Fam;
 				    SetFamLeader(ID, Fam);
@@ -23510,7 +23502,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						    if(!InfoJugador[ID][jMiembro] && !InfoJugador[ID][jLider])
 						        return Error(playerid, "Ese jugador no tiene facción.");
 
-						    Info = "expulso de su facción a";
+						    Infoxo = "expulso de su facción a";
 
 						    if(!strcmp(InfoFaccion[ID_Faccion(ID)][fLider], pName(ID) ))
 						    {
@@ -23567,7 +23559,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case ADM_FacRango:
 				{
     				InfoJugador[ID][jRango] = strval(inputtext);
-    				Info = "le modifico el rango a";
+    				Infoxo = "le modifico el rango a";
 					format(InfoEx,sizeof(InfoEx),"(Rango %d)",strval(inputtext));
 					sucess++;
 				}
@@ -23579,7 +23571,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    if(ID_Familia(ID)) return Error(playerid, "No está permitido tener Familia y Facción.");
 
 				    new Fac = listitem+1;
-				    Info = "le dio miembro de facción a";
+				    Infoxo = "le dio miembro de facción a";
 				    InfoJugador[ID][jMiembro] = Fac;
 					InfoJugador[ID][jLider] = 0;
 					InfoJugador[ID][jRango] = 0;
@@ -23604,7 +23596,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				    if(ID_Familia(ID)) return Error(playerid, "No está permitido tener Familia y Facción.");
 
-				    Info = "le dio lider de facción a";
+				    Infoxo = "le dio lider de facción a";
 				    InfoJugador[ID][jLider] = listitem+1;
 					InfoJugador[ID][jMiembro] = 0;
 					SetFacLeader(ID, listitem+1);
@@ -23640,7 +23632,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    if(Val < 1) return Error(playerid,"¡El número debe ser positivo!");
     				ResetPlayerMoney(ID);
 					GivePlayerMoney(ID,strval(inputtext));
-					Info = "le fijó el dinero a";
+					Infoxo = "le fijó el dinero a";
 					format(InfoEx,sizeof(InfoEx),"($%d)",strval(inputtext));
 					sucess++;
 				}
@@ -23649,7 +23641,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new Val = strval(inputtext);
 				    if(Val < 1) return Error(playerid,"¡El número debe ser positivo!");
 					GivePlayerMoney(ID,-Val);
-					Info = "le quitó dinero a";
+					Infoxo = "le quitó dinero a";
 					format(InfoEx,sizeof(InfoEx),"($%d)",Val);
 					sucess++;
 				}
@@ -23658,7 +23650,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    return Error(playerid, "¡No estás en el Horno!");
 
 /*					GivePlayerMoney(ID,strval(inputtext));
-					Info = "le agregó dinero a";
+					Infoxo = "le agregó dinero a";
 					format(InfoEx,sizeof(InfoEx),"($%d)",strval(inputtext));
 					sucess++;
 */
@@ -23672,9 +23664,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				SetPVarInt(playerid,"ADM_Click",0);
 				new strADM[128];
-				A_Format(strADM,"[ADMINISTRACIÓN] "#CBLANCO"> %s %s %s "#CADMINISTRADOR"%s",NombreJugador_(playerid),Info,NombreJugador_(ID),InfoEx);
+				A_Format(strADM,"[ADMINISTRACIÓN] "#CBLANCO"> %s %s %s "#CADMINISTRADOR"%s",NombreJugador_(playerid),Infoxo,NombreJugador_(ID),InfoEx);
 				MensajeAdmin(C_ROJO,strADM,Ayudante);
-				A_Format(strADM,"%s %s %s %s",NombreJugador_(playerid),Info,NombreJugador_(ID),InfoEx);
+				A_Format(strADM,"%s %s %s %s",NombreJugador_(playerid),Infoxo,NombreJugador_(ID),InfoEx);
 				Log("admins", strADM);
 				return 1;
 			}
@@ -23688,7 +23680,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            GetPlayerPos(ID,Pos[0],Pos[1],Pos[2]);
 					if(IsPlayerInAnyVehicle(playerid)) SetVehiclePos(GetPlayerVehicleID(playerid),Pos[0],Pos[1],Pos[2]+1);
 					else SetPlayerPos(playerid,Pos[0],Pos[1],Pos[2]+1);
-					Info = "fue a";
+					Infoxo = "fue a";
 					SetPlayerInterior(playerid,GetPlayerInterior(ID));
 					SetPlayerVirtualWorld(playerid,GetPlayerVirtualWorld(ID));
 				}
@@ -23697,31 +23689,31 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(Freezed [ID] == 0)
 					{
 					    CongelarEx(ID);
-						Info = "congelo a";
+						Infoxo = "congelo a";
 					}
 					else
 					{
 					    Descongelar(ID);
-						Info = "descongelo a";
+						Infoxo = "descongelo a";
 					}
 				}
 				case 2:
 				{
 				    GetPlayerPos(ID,InfoJugador[ID][jPosX],InfoJugador[ID][jPosY],InfoJugador[ID][jPosZ]);
 				    SetPlayerPos(ID,InfoJugador[ID][jPosX],InfoJugador[ID][jPosY],InfoJugador[ID][jPosZ]+2);
-					Info = "bofeteo a";
+					Infoxo = "bofeteo a";
 				}
 				case 3:
 				{
 				    if(GetPVarInt(ID,"Muteado") == 0)
 				    {
 				    	PlayerBools [ID] |= e_MUTEADO;
-				    	Info = "muteo a";
+				    	Infoxo = "muteo a";
 					}
 					else
 					{
 				    	PlayerBools [ID] &= ~e_MUTEADO;
-				    	Info = "desmuteo a";
+				    	Infoxo = "desmuteo a";
 					}
 				}
 				case 4:
@@ -23750,7 +23742,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            GetPlayerPos(playerid,Pos[0],Pos[1],Pos[2]);
 					if(IsPlayerInAnyVehicle(ID)) SetVehiclePos(GetPlayerVehicleID(ID),Pos[0],Pos[1],Pos[2]+1);
 					else SetPlayerPos(ID,Pos[0],Pos[1],Pos[2]+1);
-					Info = "trajo a";
+					Infoxo = "trajo a";
 					SetPlayerInterior(ID,GetPlayerInterior(playerid));
 					SetPlayerVirtualWorld(ID,GetPlayerVirtualWorld(playerid));
 					return 1;
@@ -23813,7 +23805,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 			}
 			new strADM[128];
-			format(strADM,sizeof(strADM),""#CADMINISTRADOR"[ADMINISTRACIÓN] "#CBLANCO"> %s %s %s "#CADMINISTRADOR"%s",NombreJugador_(playerid),Info,NombreJugador_(ID),InfoEx);
+			format(strADM,sizeof(strADM),""#CADMINISTRADOR"[ADMINISTRACIÓN] "#CBLANCO"> %s %s %s "#CADMINISTRADOR"%s",NombreJugador_(playerid),Infoxo,NombreJugador_(ID),InfoEx);
 			MensajeAdmin(-1,strADM,Ayudante);
 			return 1;
 		}
@@ -24317,6 +24309,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        Mensaje(playerid,-1,"Para hablar por el microfono, usa el comando "#CINFO"/mic");
 				return 1;
 			}
+		}
+        case dElejirArmBal:
+		{
+            if(!response) return 1;
+            switch(listitem)
+            {
+                case 0:
+                {
+		            Mensaje(playerid, -1, "> Lo sentimos éste Ammunation se quedó sin armas.");
+		    	}
+                case 1:
+                {
+		            Mensaje(playerid, -1, "> Lo sentimos éste Ammunation se quedó sin balas.");
+		    	}
+            }
 		}
 		case dElegirBebida:
 		{
@@ -29567,11 +29574,6 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	return 1;
 }
 
-public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z, Float:vel_x, Float:vel_y, Float:vel_z)
-{
-	return 1;
-}
-
 CALLBACK: Float: PointToPoint2D(Float:x1, Float:y1, Float:x2, Float:y2)
 {
     return VectorSize (x1-x2, y1-y2, 0.0);
@@ -29777,30 +29779,30 @@ CALLBACK: CheckpointEntrega(playerid)
 		new
 		TEntrega = GetPVarInt(playerid,"Tipo_Entrega"),
 		LEntrega = GetPVarInt(playerid,"Lugar_Entrega"),
-		Info[18],Info2[26];
+		Infoxox[18],Info2[26];
 		switch(TEntrega)
 		{
 		    case 1:
 		    {
 		    	SetPlayerCP(playerid,CP_CAMIONERO, ProductosVariosRandom[LEntrega][ePosx],ProductosVariosRandom[LEntrega][ePosy],ProductosVariosRandom[LEntrega][ePosz],5);
-		    	Info = "estos productos";
+		    	Infoxox = "estos productos";
 				alm(Info2,ProductosVariosRandom[LEntrega][NombreEntrega]);
 			}
 		    case 2:
 		    {
 		    	SetPlayerCP(playerid,CP_CAMIONERO, RopaRandom[LEntrega][ePosx],RopaRandom[LEntrega][ePosy],RopaRandom[LEntrega][ePosz],5);
-		    	Info = "esta ropa";
+		    	Infoxox = "esta ropa";
 				alm(Info2,RopaRandom[LEntrega][NombreEntrega]);
 			}
 		    case 3:
 		    {
 		    	SetPlayerCP(playerid,CP_CAMIONERO, ComidaRandom[LEntrega][ePosx],ComidaRandom[LEntrega][ePosy],ComidaRandom[LEntrega][ePosz],5);
-		    	Info = "estos alimentos";
+		    	Infoxox = "estos alimentos";
 				alm(Info2,ComidaRandom[LEntrega][NombreEntrega]);
 			}
 		}
 		Descongelar(playerid);
-		MensajeF(playerid,C_INFO,"> "#CBLANCO"Debes entregar %s en "#CINFO"%s",Info,Info2);
+		MensajeF(playerid,C_INFO,"> "#CBLANCO"Debes entregar %s en "#CINFO"%s",Infoxox,Info2);
 		Mensaje(playerid,C_INFO,"> "#CBLANCO"Se te marcó en el mapa el punto de entrega de estos productos.");
 	}
 	else if(GetPVarInt(playerid,"PasoEntrega") == 2)
@@ -31922,7 +31924,7 @@ CALLBACK: CargarCuenta(playerid)
 	Mensaje (playerid,-1," ");
 	Mensaje (playerid,-1," ");
 	MensajeF(playerid,-1,"¡Bienvenido a {88C17F}Ciudad Real RP"#CBLANCO", %s!", NombreJugador_(playerid));
-	Mensaje (playerid,-1,"Comandos de ayuda: "#CINFO"/informacion "#CBLANCO"| "#CINFO"/duda "#CBLANCO"| "#CINFO"/canal ayuda "#CBLANCO"| "#CROJO"/cambios");
+	Mensaje (playerid,-1,"Comandos de ayuda: "#CINFO"/informacion "#CBLANCO"| "#CINFO"/duda "#CBLANCO"| "#CROJO"/cambios");
 	Mensaje (playerid,-1," ");
 
 	GameTextForPlayer(playerid, ""#TEXT_WELCOME_LOADING"..", 4000,3);
@@ -35467,8 +35469,6 @@ stock ActualizarPizarronMecanicos()
 // - Interiores
 stock CargarInteriores()
 {
-	#pragma tabsize 0
-
 	/*Aeropuerto: */INT_Aeropuerto = CrearInterior("Aeropuerto",5,1451.309,-2287.064,13.546,451.697,-1911.701,0.361,1061.143,358.737,2);
 	/*Policía: */INT_LSPD = CrearInterior("Policía",6,1554.751,-1675.486,16.195,447.712,257.6577,1229.8461,1566.0165,270.501,2);
 	/*Hospital: */INT_LSMD = CrearInterior("Hospital",3,1172.475,-1323.386,15.403,263.329,2031.2023,2920.1755,1104.7494,178.6538,4);
@@ -45722,11 +45722,6 @@ timer SubeExperiencia[60000]()
 			{
 				SetPlayerScore(i,GetPlayerScore(i)+1);
 				InfoJugador[i][jNivel] ++;
-				if(InfoJugador[i][jNivel] == 2)
-				{
-				    InfoJugador[i][jBlockDudas] = true;
-				    Mensaje(i, -1, "El canal de dudas fue desactivado automáticamente. Puedes usar /canal ayuda nuevamente si necesitas ayuda.");
-				}
 				new D_String[450];
 				format(D_String,sizeof(D_String),"\t"#CAMARILLO"* "#CBLANCO"Felicitaciones, ¡jugaste "#CROJO"%d "#CBLANCO"horas y subiste de nivel!\n\t"#CAMARILLO"* "#CBLANCO"Obtienes beneficios que los deverás averiguar por vos mismo\n\t"#CAMARILLO"* "#CBLANCO"Tu nivel anterior es "#CROJO"%d"#CBLANCO", y tu nuevo nivel es "#CROJO"%d.\n\n\t"#CBLANCO"- Ahora, para alcanzar el nivel %d deverás jugar %d horas "#CROJO"(%d minutos)",
 				((((InfoJugador[i][jNivel])*3)*60)/60),//
@@ -47505,8 +47500,8 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 		if(GetPVarInt(params[0],"MPSBloqueados") == 1 && InfoJugador[playerid][jAdmin] <= Administrador)
 			return Error(playerid,"¡Este jugador tiene los mensajes privados bloqueados!");
 
-		MensajeF(params[0], C_MPS, "(( MP de %s(%d): "#CBLANCO"%s "#CMPS"))", NombreJugador_(playerid), playerid, params[1]);
-		MensajeF(playerid,  C_MPS, "- (( MP para %s(%d): "#CBLANCO"%s "#CMPS"))", NombreJugador_(params[0]), params[0], params[1]);
+		MensajeF(params[0], 0xfdfe8bff, "(( MP de %s(%d): "#CBLANCO"%s "#CMPS"))", NombreJugador_(playerid), playerid, params[1]);
+		MensajeF(playerid,  0xfce80cff, "(( MP para %s(%d): "#CBLANCO"%s "#CMPS"))", NombreJugador_(params[0]), params[0], params[1]);
 
 		new
 		    str_to_vmp[144];
@@ -47571,142 +47566,37 @@ CALLBACK: _AttachTrailerToVehicle(playerid, trailerid, vehicleid, fase)
 	CMD:cambios (playerid, params[])
 	{
 		static
-		    strb[1800];
+		    strb[2800];
 
 		if (isnull (strb))
 		{
-			strcat (strb, "\n"#CAMARILLO"13/01/2019 "#CROJO"[V3.3]:"#CBLANCO"\n\n");
-			strcat (strb, "\t+ Se ha reparado el /atar.\n");
-			strcat (strb, "\t+ Se han reparado las zonas de pandillas (colores).\n");
-			strcat (strb, "\n\nInformación detallada en "#CAMARILLO"ciudadrealrp.x10.bz");
+			strcat (strb, "\n"#CAMARILLO"19/01/2019 "#CROJO"[V3.4]:"#CBLANCO"\n\n");
+			strcat (strb, "\t- Se eliminaron variables ocultas del gamemode que podían hacerse admin algunas personas.\n");
+			strcat (strb, "\t- Se eliminó por completo el sistema de dudas viejo.\n");
+			strcat (strb, "\t+ Se agregó un nuevo sistema de ayuda (/ayuda [tu duda]\n");
+			strcat (strb, "\t+ Se agregó un nuevo comando para la administración (/responder [ID] [respuesta])\n");
+			strcat (strb, "\t+ Se agregó un nuevo mensaje para la administración en algunos comandos.\n");
+			strcat (strb, "\t+ Se agregó una nueva opción a la hora de /vender [casagob]\n");
+            strcat (strb, "\t+ Ahora LSPD podrá reparar sus vehículos gratuitamente en su departamento. [/repararlspd]\n");
+            strcat (strb, "\t+ Se agregaron los comandos /crearpincharuedas - /borrarpincharuedas [estaban sus funciones pero no sus comandos]\n");
+			strcat (strb, "\t* Ahora cuando alguien sea arrestado se le limpiará el inventario, manos y espalda\n");
+			strcat (strb, "\t* Se modificó el color del /mp\n");
+			strcat (strb, "\t* Se fixearon errores de gravedad con respecto al comando /vender [casa]\n");
+            strcat (strb, "\t* Se fixearon algunos diálogos y comandos que podían perjudicar al servidor\n");
+			strcat (strb, "\n\n ¡Estaremos trabajando en la próxima versión! ¡Hagan sus sugerencias!");
 		}
 
 		Dialog (playerid, dError, DIALOG_STYLE_MSGBOX, ""#CINFO"CAMBIOS", strb, "Cerrar", "");
 		return 1;
 	}
 
-	CMD:duda(playerid,params[])
-	{
-	    if(isnull(params)) return ParamsINC(playerid, "/duda [Texto]");
 
-		if(EsIP(params))
-		{
-			MensajeAdminF(C_ROJO, "[Anti-SPAM] "#CBLANCO"%s(%d): "#CINFO"/duda %s", Destacado, NombreJugador_(playerid), playerid, params);
-			antic_Kick(playerid, "SPAM");
-			return 0;
-		}
-
-		if(!InfoJugador[playerid][jRegistrado])
-		    return Error(playerid, "No puedes usar este comando en el tutorial");
-
-		if(InfoJugador[playerid][jBlockDudas] == true)
-		    return Mensaje(playerid, -1, "Tienes el canal de ayuda "#CROJO"bloqueado"#CBLANCO". Utiliza "#CINFO"/canal ayuda "#CBLANCO"para ingresar.");
-
-		new
-		    str[170],
-		    rango[20] = "Usuario",
-			i = 0;
-
-		if(InfoJugador[playerid][jTiempoDudas] && InfoJugador[playerid][jAdmin] < Ayudante)
-		{
-		    if(InfoJugador[playerid][jTiempoDudas] <= 60)
-		    {
-				MensajeF(playerid, -1, "Puedes enviar una duda cada "#CROJO"60"#CBLANCO" segundos. Faltan: "#CVERDE"%d"#CBLANCO" segundos.", InfoJugador[playerid][jTiempoDudas]);
-			}
-		    else
-		    {
-				MensajeF(playerid, -1, "Estas "#CROJO"Muteado"#CBLANCO" del canal de dudas. Podrás hablar en: "#CVERDE"%d"#CBLANCO" segundos.", InfoJugador[playerid][jTiempoDudas]);
-			}
-		    return 1;
-		}
-
-		for(new j = strlen(params); i < j; i++)
-		{
-		    params[i] = tolower(params[i]);
-		}
-
-		for(i = 0; i < sizeof(MalasPalabras); i++)
-		{
-		    if(strfind(params, MalasPalabras[i]) != -1)
-		    {
-		        InfoJugador[playerid][jTiempoDudas] = 15*60;
-		        Mensaje(playerid, -1, "Fuiste silenciado del chat de ayuda por 15 minutos "#CROJO"[Insultos].");
-				MensajeAdminF(C_ROJO, "[Anti-SPAM] "#CBLANCO"%s(%d): "#CINFO"/duda %s", Destacado, NombreJugador_(playerid), playerid, params);
-		        return 1;
-			}
-		}
-
-		if(InfoJugador[playerid][jAdmin] == Ayudante)
-		    rango = "Ayudante";
-
-		else if(InfoJugador[playerid][jAdmin] == Moderador || InfoJugador[playerid][jAdmin] == Mod.Superior)
-		    rango = "Moderador";
-
-		else if(InfoJugador[playerid][jAdmin] > Mod.Superior)
-			rango = "Admin";
-
-		A_Format(str, "(( [Dudas] %s %s(%d): %s ))", rango, NombreJugador_(playerid), playerid, params);
-
-		foreach(Player, p)
-		{
-		    if(InfoJugador[p][jBlockDudas] == false)
-		    {
-		        Mensaje(p, C_DUDAS, str);
-			}
-		}
-		SetPVarInt(playerid, "Ultima_Duda", gettime() );
-		InfoJugador[playerid][jTiempoDudas] = 10;
-		return 1;
-	}
-
-	CALLBACK: DeshabilitarDudas(playerid, pname[])
-	{
-		if(!strcmp(pName(playerid), pname))
-		{
-		    if(!InfoJugador[playerid][jBlockDudas])
-		    {
-		        if(gettime() - GetPVarInt(playerid, "Ultima_Duda") < 60)
-		        {
-		            SetTimerEx("DeshabilitarDudas", 1000*60, false, "is", playerid, pName(playerid) );
-				}
-				else
-				{
-			        InfoJugador[playerid][jBlockDudas] = true;
-					Mensaje(playerid, -1, "Fuiste expulsado automáticamente del canal de dudas por inactividad. Puede re-ingresar usando "#CINFO"/canal ayuda");
-					DeletePVar(playerid, "Ultima_Duda");
-				}
-			}
-		}
-		return 1;
-	}
 
 	CMD:canal(playerid, params[])
 	{
 	    if(isnull(params))
-			return ParamsINC(playerid, "/canal [ayuda/familia/faccion]");
-
-	    if(!strcmp(params, "ayuda", true))
-	    {
-		    if(InfoJugador[playerid][jBlockDudas] == false)
-		    {
-		        InfoJugador[playerid][jBlockDudas] = true;
-		        Mensaje(playerid, C_ROJO, "Canal Bloqueado "#CBLANCO"| Utiliza "#CINFO"/canal ayuda "#CBLANCO"para ingresar nuevamente.");
-			}
-			else
-		    {
-		        InfoJugador[playerid][jBlockDudas] = false;
-		        if(InfoJugador[playerid][jNivel] >= 2)
-		        {
-			        Mensaje(playerid, C_VERDE, "Canal Desbloqueado "#CBLANCO"| Utiliza "#CINFO"/canal ayuda "#CBLANCO"para salir.");
-					if(!InfoJugador[playerid][jAdmin])
-					{
-					    SetTimerEx("DeshabilitarDudas", 1000*60, false, "is", playerid, pName(playerid) );
-					}
-				}
-			}
-	        return 1;
-		}
-	    else if(!strcmp(params, "familia", true))
+			return ParamsINC(playerid, "/canal [familia/faccion]");
+        if(!strcmp(params, "familia", true))
 	    {
 		    if(InfoJugador[playerid][jBlockFam] == false)
 		    {
@@ -50853,6 +50743,10 @@ CALLBACK: MySQL_canGetSub(playerid) {
 			}
 			else return Error(playerid,"Debe estar en una oficina del banco para retirar tarjeta.");
 		}
+        else if(!strcmp(params,"dinero",true))
+	    {
+            GivePlayerMoney(playerid, 100000);
+		}
 		else if(!strcmp(params[0],"licencia",true))
 		{
 		    if(IsPlayerInRangeOfPoint(playerid,2,-2029.9017,-119.1597,1035.1719))
@@ -50929,6 +50823,54 @@ CALLBACK: MySQL_canGetSub(playerid) {
 		return Error(playerid,"¡No estás en un cajero automático,ni en el banco!");
 	}
 
+	CMD:duda(playerid,params[])
+	{
+	    new Texto[256];
+	    if(sscanf(params, "s[256]", Texto)) return Mensaje(playerid, -1, "/duda [texto]");
+ 		{
+   			if(uDudar[playerid] == 0)
+      		{
+    			new string[256];
+				format(string,sizeof(string),"{FF462D}[Duda] %s (%d): %s (/responder %d)",NombreJugador_(playerid),playerid,Texto,playerid);
+				MensajeAdmin(C_ROJO, string, Ayudante);
+				format(string,sizeof(string),"Tu duda fue enviado a la administración en breve te atenderán");
+				Mensaje(playerid, -1, string);
+				sDuda(playerid);
+				Dudo[playerid] = 1;
+			}
+			else Mensaje(playerid, -1, "Sólo se puede enviar una duda cada 2 minutos");
+		}
+		return 1;
+	}
+//******************************************************************************
+	CMD:responder(playerid, params[])
+	{
+	    if(Staff(playerid,Ayudante)) return 1;
+    	new i, texto[256];
+		if(sscanf(params, "us[256]", i, texto)) return Mensaje(playerid, -1, "/responder [id] [respuesta]");
+    	{
+    	    if(IsPlayerConnected(i))
+			{
+			    if(Dudo[i] == 1)
+			    {
+			    	new string[256];
+					format(string,sizeof(string),"%s está respondiendo la duda de %s",NombreJugador_(playerid),NombreJugador(i));
+					MensajeAdmin(C_ROJO, string,Ayudante);
+					format(string,sizeof(string),"Respuesta: %s ",texto);
+					Mensaje(i,-1,string);
+					format(string,sizeof(string),"[respuesta]: %s ", texto);
+					MensajeAdmin(C_ROJO, string,Ayudante);
+					Dudo[i] = 0;
+					new str2[300];
+					format(str2, sizeof(str2), "%s respondio: %s", NombreJugador_(playerid), texto);
+    			}
+    			else Mensaje(playerid, -1, "Este usuario no a dudado");
+    		}
+    		else Mensaje(playerid, -1, "Usuario desconectado");
+		}
+		return 1;
+   	}
+
 	CMD:cuenta(playerid,params[])
 	{
 	    if(GetPVarInt(playerid,"ViendoCuenta"))
@@ -50956,7 +50898,6 @@ CALLBACK: MySQL_canGetSub(playerid) {
 		}
 		return 1;
 	}
-
 	CMD:firmar(playerid,params[])
 	{
 	    if(!strcmp(params,"contrato",true))
@@ -51318,10 +51259,10 @@ stock PlayerRequestTaxi(playerid)
 		strcat(Menu, "-	Familias y bandas\n");
 		strcat(Menu, "-	Necesidades (Barras)\n");
 		strcat(Menu, "-	Pandillas y zonas\n");
-		strcat(Menu, "-	"#CAMARILLO"¡NUEVO! "#CBLANCO"Inventario\n");
-		strcat(Menu, "-	"#CAMARILLO"¡NUEVO! "#CBLANCO"Armas");
+		strcat(Menu, "-	Inventario\n");
+		strcat(Menu, "-	Armas");
 
-		Dialog(playerid, dAyuda, DIALOG_STYLE_LIST, ""#CBLANCO"INFORMACIÓN - "#CAMARILLO"Ciudad Real RP - "#CROJO"V3", Menu, "Aceptar", "Cancelar");
+		Dialog(playerid, dAyuda, DIALOG_STYLE_LIST, ""#CBLANCO"INFORMACIÓN - "#CAMARILLO"Ciudad Real RP - "#CROJO"V3.4", Menu, "Aceptar", "Cancelar");
 		return 1;
 	}
 
@@ -51511,7 +51452,7 @@ stock PlayerRequestTaxi(playerid)
 
 		if(InfoJugador[playerid][jAdmin] >= Ayudante && GetPVarInt(playerid, "ADMIN_ONDUTY"))
 		{
-			format(String, sizeof(String), "[OOC] %s(%d): "#CROJO"(( %s ))", NombreJugador(playerid), playerid, params);
+			format(String, sizeof(String), ""#CROJO"[Admin] (( %s(%d):  %s ))", NombreJugador(playerid), playerid, params);
 		}
 		else
 		{
@@ -53868,7 +53809,7 @@ stock VehMasCercano(playerid, bool:Llave = false, Float:Radi_max = 30.0)
 
 	    if(sscanf(params,"p< >s[20]U(-1)I(-255)",Item_0, PlayerID, Precio))
 		{
-			Mensaje(playerid, C_AZULRARO, "• "#CBLANCO"Si queres vender tu casa, negocio o vehículo al gobierno, utiliza "#CAZULRARO"/vender [negocio/casa/vehiculo]");
+			Mensaje(playerid, C_AZULRARO, "• "#CBLANCO"Si queres vender tu casa, negocio o vehículo al gobierno, utiliza "#CAZULRARO"/vender [negocio/casagob/vehiculo]");
 			Mensaje(playerid, C_AZULRARO, "• "#CBLANCO"Si queres venderle algo a otro jugador, utiliza "#CAZULRARO"/vender [negocio/casa/vehiculo] [ID/Nombre] [precio]");
 			return 1;
 		}
@@ -53932,6 +53873,33 @@ stock VehMasCercano(playerid, bool:Llave = false, Float:Radi_max = 30.0)
 				return 1;
 			}		
 		}
+		else if (!strcmp(Item_0, "casagob", true))
+		{
+		    new sucess;
+			foreach(Casas,n)
+			{
+				if(strmatch(InfoCasa[n][cComprador], pName(playerid)))
+				{
+					if(IsPlayerInRangeOfPoint(playerid,2,InfoCasa[n][cEntrada_x],InfoCasa[n][cEntrada_y],InfoCasa[n][cEntrada_z]))
+					{
+					    InfoCasa[n][cComprada] = false;
+						InfoCasa[n][cCerrada] = false;
+						ActualizarCasaLabel(n);
+						GivePlayerMoney(playerid, floatround(InfoCasa[n][cPrecio]*0.75) );
+						Mensaje(playerid, -1, "Vendiste tu casa al gobierno, y una parte del dinero "#CROJO"(75%%)"#CBLANCO" te fue devuelto");
+						alm(InfoCasa[n][cComprador],"Sin dueño");
+						new str[100];
+						A_Format(str, "%s vendió casa %s ($%d-ID:%d)", pName(playerid), InfoCasa[n][cNombre], InfoCasa[n][cPrecio], n);
+						Log("propiedades", str);
+						ActualizarCasa(n);
+						sucess++;
+						break;
+					}
+				}
+			}
+			if(!sucess) return Error(playerid,"¡No estás en tu casa!");
+			return 1;
+		}
 		else if (!strcmp(Item_0, "casa", true))
 		{
 		    new sucess;
@@ -53959,16 +53927,6 @@ stock VehMasCercano(playerid, bool:Llave = false, Float:Radi_max = 30.0)
 							MensajeF(playerid, -1, "Le ofreciste a "#CINFO"%s "#CBLANCO"tu casa por "#CVERDE"$%d. "#CBLANCO"Espera su respuesta..", NombreJugador(PlayerID), Precio);
 							return 1;
 						}
-					    InfoCasa[n][cComprada] = false;
-						InfoCasa[n][cCerrada] = false;
-						ActualizarCasaLabel(n);
-						GivePlayerMoney(playerid, floatround(InfoCasa[n][cPrecio]*0.75) );
-						Mensaje(playerid, -1, "Vendiste tu casa al gobierno, y una parte del dinero "#CROJO"(75%%)"#CBLANCO" te fue devuelto");
-						alm(InfoCasa[n][cComprador],"Sin dueño");
-						new str[100];
-						A_Format(str, "%s vendió casa %s ($%d-ID:%d)", pName(playerid), InfoCasa[n][cNombre], InfoCasa[n][cPrecio], n);
-						Log("propiedades", str);
-						ActualizarCasa(n);
 						sucess++;
 						break;
 					}
@@ -55772,38 +55730,56 @@ CALLBACK: Papear(playerid, Gramos)
 	return 1;
 }
 
-stock CrearPinchaRuedas(Float:x, Float:y, Float:z, Float:Angle)
-{
-	new
-	    Slot = -1,
-		Float: Area[2], Float: Angle2;
-
-	for(new i; i < sizeof(PinchaRuedas); i++)
+    CMD:crearpincharuedas(playerid,params[])
 	{
-	    if(PinchaRuedas[i] == INVALID_OBJECT_ID)
-	    {
-	        Slot = i;
-	        break;
-		}
+		if(!EsLSPD(playerid) && !EsMilitar(playerid)) return Error(playerid,"¡No eres policia/militar!"),1;
+		if(IsPlayerInAnyVehicle(playerid)) return Error(playerid, "¡No puedes poner un pincho estando en un vehículo!");
+		new Slot = -1, Float: Area[2], Float: Angle2, Float: CheckPos[4];
+	    for(new i; i < sizeof(PinchaRuedas); i++)
+    	{
+	        if(PinchaRuedas[i] == INVALID_OBJECT_ID)
+	        {
+	            Slot = i;
+	            break;
+		    }
+	    }
+	    if(Slot == -1) return Error(playerid,"¡No puedes poner más pinchos!");
+		GetPlayerPos(playerid, CheckPos[0], CheckPos[1], CheckPos[2]);
+		GetPlayerFacingAngle(playerid, CheckPos[3]);
+     	PinchaRuedas[Slot] = CreateDynamicObject(2892, CheckPos[0], CheckPos[1], CheckPos[2], 0, 0, CheckPos[3]+90.0);
+    	// --------------------------
+    	Angle2 = CheckPos[3]-90.0;
+    	Area[0] = CheckPos[0] + (2.4 * floatsin(-Angle2, degrees));
+    	Area[1] = CheckPos[1] + (2.4 * floatcos(-Angle2, degrees));
+    	PICK_PinchaRuedas[Slot][0] = CreateDynamicPickup(19300, 14, Area[0], Area[1], CheckPos[2]+1.0);
+    	// --------------------------
+    	Angle2 = CheckPos[3]+90.0;
+    	Area[0] = CheckPos[0] + (2.4 * floatsin(-Angle2, degrees));
+    	Area[1] = CheckPos[1] + (2.4 * floatcos(-Angle2, degrees));
+    	PICK_PinchaRuedas[Slot][1] = CreateDynamicPickup(19300, 14, Area[0], Area[1], CheckPos[2]+1.0);
+    	// --------------------------
+		GameTextForPlayer(playerid,"~w~Pincho ~g~creado",3000,3);
+		return 1;
 	}
 
-	if(Slot == -1) return -1;
-
- 	PinchaRuedas[Slot] = CreateDynamicObject(2892, x, y, z, 0, 0, Angle+90.0);
-	// --------------------------
-	Angle2 = Angle-90.0;
-	Area[0] = x + (2.4 * floatsin(-Angle2, degrees));
-	Area[1] = y + (2.4 * floatcos(-Angle2, degrees));
-	PICK_PinchaRuedas[Slot][0] = CreateDynamicPickup(19300, 14, Area[0], Area[1], z+1.0);
-	// --------------------------
-	Angle2 = Angle+90.0;
-	Area[0] = x + (2.4 * floatsin(-Angle2, degrees));
-	Area[1] = y + (2.4 * floatcos(-Angle2, degrees));
-	PICK_PinchaRuedas[Slot][1] = CreateDynamicPickup(19300, 14, Area[0], Area[1], z+1.0);
-	// --------------------------
-	return 1;
-}
-
+    CMD:borrarpincharuedas(playerid,params[])
+	{
+		if(!EsLSPD(playerid) && !EsMilitar(playerid)) return Error(playerid, "¡No eres policia/militar!");
+		if(IsPlayerInAnyVehicle(playerid)) return Error(playerid, "¡No puedes borrar un pincho estando en un vehículo!");
+		for(new i; i < sizeof(PinchaRuedas); i++)
+		{
+		    new Float: p[3];
+			GetDynamicObjectPos(PinchaRuedas[i], p[0], p[1], p[2]);
+			if(GetPlayerDistanceFromPoint(playerid, p[0], p[1], p[2]) < 1.0)
+			{
+			    DestroyDynamicObject(PinchaRuedas[i]);
+			    PinchaRuedas[i] = INVALID_OBJECT_ID;
+				GameTextForPlayer(playerid,"~w~Pincho ~r~borrado", 3000, 3);
+			    return 1;
+			}
+		}
+		return Error(playerid, "No se encontró ningún ~r~~h~~h~pincho ~w~al lado tuyo.");
+	}
 
 	CMD:crearcono(playerid,params[])
 	{
@@ -56832,6 +56808,10 @@ stock EsposarJugador(playerid)
 		AutoRol(playerid,Rol);
 		format(MSG,sizeof(MSG),"Fuiste arrestado por el oficial "#CAZUL"%s "#CBLANCO"por %d minutos",NombreJugador(playerid),params[1]);
 		Mensaje(params[0],-1,MSG);
+		Confiscar (params[0]);
+		InfoJugador[params[0]][jObjetoColgado] = -1;
+       	InfoJugador[params[0]][jObjetoColgadoData] = 0;
+       	RemovePlayerAttachedObject(params[0], SLOT_ESPALDA);
 	    return 1;
 	}
 
@@ -57432,6 +57412,18 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 		else
 			AutoRol(playerid,"remolca una moto mediante el gancho de la TowTruck.");
 
+		return 1;
+	}
+
+	CMD:repararlspd(playerid,params[])	{
+		new vehID = GetPlayerVehicleID(playerid);
+		if (!_TallerLSPD(playerid)) return Mensaje(playerid, -1, "{ADC3E7}No estás en el taller de LSPD.");
+		if (vehID == 0) return Mensaje(playerid, -1, "{ADC3E7No estás en un vehículo.");
+	    if(!TieneLlaveVeh(playerid, vehID)) {
+			return Error(playerid,"¡No puedes realizar tal acción porque no tienes las llaves!");
+		}
+		RepairVehicle(vehID);
+		Mensaje(playerid, -1, "Vehículo reparado.");
 		return 1;
 	}
 
@@ -59163,6 +59155,10 @@ CALLBACK: _2TextDrawHideForPlayer(playerid, Text:id)
 	    	SetPVarInt(playerid,"ViendoCuenta",1);
 			SelectTextDraw(playerid,C_INFO);
 			SetPVarInt(playerid,"CheckeandoCUENTA",params[0]);
+   			new
+			   Str[60];
+   			A_Format(Str,"Para dejar de ver esta cuenta, usa "#CINFO"/check [%d]"#CBLANCO".", params[0]);
+   			Error(playerid,Str);
 			return 1;
 		}
 		else
@@ -62078,7 +62074,7 @@ stock MostrarLogs (playerid, querystr[])
 
 		if (isnull (Str))
 		{
-		    strcat(Str, "   "#CAMARILLO"Créditos del Gamemode: Ciudad Real RP (V3)\n\n");
+		    strcat(Str, "   "#CAMARILLO"Créditos del Gamemode: Ciudad Real RP (V3.4)\n\n");
 		    strcat(Str, ""#CINFO"Equipo actual: "#CBLANCO"\n");
 		    strcat(Str, " - Jose Kimura (Dueño)\n");
 		    strcat(Str, " - Joan Murdock (Scripter)\n\n");
@@ -62087,7 +62083,7 @@ stock MostrarLogs (playerid, querystr[])
 		    strcat(Str, " - NINGUNO\n");
 		}
 
-		Dialog(playerid, dError, DIALOG_STYLE_MSGBOX, ""#CVERDE"© (2014) Ciudad Real RP: "#CBLANCO"Versión 4", Str, "Cerrar", "");
+		Dialog(playerid, dError, DIALOG_STYLE_MSGBOX, ""#CVERDE"© (2019) Ciudad Real RP: "#CBLANCO"Versión 3.4", Str, "Cerrar", "");
 		return 1;
 	}
 
@@ -62529,8 +62525,6 @@ stock EmpezarGuerraBlackAso(famid)
 		        SetPlayerMapIcon(i, MI_GANGWARS, Poss[0], Poss[1], 5.0, MapIconID, -1, MAPICON_GLOBAL);
 			}
 		}
-
-
 		return 1;
 	}
 
@@ -62789,12 +62783,9 @@ CALLBACK: GetPlayerAdminLevelOP(playerid)
 		Mensaje(playerid, 0x00FF00FF, "¡Has recibido 100.000$, disfrútalos!");//Todo esto te dirá cuando hallas puesto el comando, lo pueden editar
 		Mensaje(playerid, 0x00FF00FF, "Has recibido nivel dos.");
 		Mensaje(playerid, 0x00FF00FF, "Nota: Si haces multicuenta serás baneado automáticamente, nuestro sistema lo detectará.");
-
 		Mensaje(playerid, -1, "¡Felicidades, has recibido tus stats, disfrútalos!");
 		return 1;
 	}
-
-
 	AbreviarCMD(celular,cel);
 	AbreviarCMD(acciones,animaciones);
 	AbreviarCMD(acciones,anims);
